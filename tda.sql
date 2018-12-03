@@ -1,60 +1,68 @@
+create or replace TYPE premio AS OBJECT
+(
+	nombre VARCHAR2(30),
+	tipo VARCHAR2(11),
+	monto NUMBER(8,2),
+	posicion INTEGER,
+	descripcion VARCHAR2(10000),
+	MEMBER FUNCTION valida_tipo (tipo VARCHAR2) RETURN BOOLEAN
+)
+
 CREATE OR REPLACE TYPE BODY premio AS MEMBER FUNCTION
-valida_tipo (tipo IN VARCHAR) RETURN BOOLEAN IS
+valida_tipo (tipo VARCHAR2) RETURN BOOLEAN IS
 valor_no_valido EXCEPTION 
 resultado BOOLEAN
 begin
 	if LOWER(tipo) <> 'medalla' or LOWER(tipo) <> 'certificado' THEN
 		raise valor_no_valido;
 	else
-		RETURN (resultado = true)
+		RETURN (resultado = true);
 	END IF;
 EXCEPTION
 	WHEN valor_no_valido THEN
 		raise aplication_error(-20001, 'El dominio de tipo es Medalla o Certificado');
 END;
 
-CREATE OR REPLACE TYPE premio AS OBJECT
-(
-	nombre VARCHAR2(30),
-	tipo VARCHAR2(11),
-	monto NUMBER(8,2),
-	posicion INTEGER,
-	descripcion VARCHAR2,
-	MEMBER FUNCTION valida_tipo (tipo IN VARCHAR) RETURN BOOLEAN
-)
-
 
 CREATE OR REPLACE TYPE valoracion AS OBJECT
 (
 	nombre_elemento VARCHAR2(30),
-	valor NUMBER,
-	observacion VARCHAR2
-)
+	valor NUMBER(3,0),
+	observacion VARCHAR2(5000)
+);
 
 
 CREATE OR REPLACE TYPE lugar_nac AS OBJECT
 (
 	pais VARCHAR2(50),
 	ciudad VARCHAR2(50)
-)
+);
 
 
 
 CREATE OR REPLACE TYPE costo AS OBJECT
 (
 	pais VARCHAR2(50),
-	cant_muestras NUMBER,
-	valor NUMBER(8,2),
-)
+	cant_muestras NUMBER(3,0),
+	valor NUMBER(8,2)
+);
 
 
 CREATE OR REPLACE TYPE unidad_moneda AS OBJECT
 (
 	nombre VARCHAR2(50),
 	simbolo VARCHAR2(3),
-	valor NUMBER(8,2),
-)
+	valor NUMBER(8,2)
+);
 
+
+CREATE OR REPLACE TYPE calificacion AS OBJECT
+(
+	nombre_critico VARCHAR2(70),
+	comentarios VARCHAR2(3),
+	puntaje INTEGER,
+	MEMBER FUNCTION valida_puntaje (puntaje IN INTEGER) RETURN BOOLEAN
+);
 
 CREATE OR REPLACE TYPE BODY calificacion AS MEMBER FUNCTION
 valida_puntaje (puntaje IN INTEGER) RETURN BOOLEAN IS
@@ -71,14 +79,13 @@ EXCEPTION
 		raise aplication_error(-20001, 'El puntaje debe ser un número mayor o igual a cero');
 END;
 
-CREATE OR REPLACE TYPE calificacion AS OBJECT
-(
-	nombre_critico VARCHAR2(70),
-	comentarios VARCHAR2(3),
-	puntaje INTEGER,
-	MEMBER FUNCTION valida_puntaje (puntaje IN INTEGER) RETURN BOOLEAN
-)
 
+CREATE OR REPLACE TYPE tipo_valor AS OBJECT
+(
+	ano DATE,
+	cantidad INTEGER,
+	MEMBER FUNCTION valida_cantidad (cantidad IN INTEGER) RETURN BOOLEAN
+);
 
 CREATE OR REPLACE TYPE BODY tipo_valor AS MEMBER FUNCTION
 valida_cantidad (puntaje IN INTEGER) RETURN BOOLEAN IS
@@ -95,26 +102,19 @@ EXCEPTION
 		raise aplication_error(-20001, 'La cantidad debe ser un número mayor o igual a cero');
 END;
 
-CREATE OR REPLACE TYPE tipo_valor AS OBJECT
-(
-	ano DATE,
-	cantidad INTEGER,
-	MEMBER FUNCTION valida_cantidad (cantidad IN INTEGER) RETURN BOOLEAN
-)
-
 
 CREATE OR REPLACE TYPE exp_dist AS OBJECT
 (
-	tipo_valor tipo_valor,
-	pais VARCHAR2(50),
-)
+	tipo_de_valor tipo_valor,
+	pais VARCHAR2(50)
+);
 
 
 CREATE OR REPLACE TYPE hechos AS OBJECT
 (
 	ano DATE,
-	sucesos VARCHAR2,
-)
+	sucesos VARCHAR2(10000)
+);
 
 
 CREATE OR REPLACE TYPE escala AS OBJECT
@@ -123,4 +123,9 @@ CREATE OR REPLACE TYPE escala AS OBJECT
 	rango_i INTEGER,
 	rango_f INTEGER,
 	clasificacion VARCHAR2(1)
-)
+);
+
+
+
+CREATE OR REPLACE TYPE tipo_valor_fila as TABLE OF tipo_valor;
+CREATE OR REPLACE TYPE exp_dist_fila as TABLE OF exp_dist;
